@@ -1,0 +1,32 @@
+{
+    "name": "polymer-chat",
+    "version": "0.0.1",
+    "authors": [
+        "Miriam Merchante"
+    ],
+    "description": "Chat with Polymer",
+    "keywords": [
+        "polymer",
+        "material",
+        "design",
+        "pubnub",
+        "chat"
+    ],
+    "license": "MIT",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ],
+    "dependencies": {
+        "polymer": "Polymer/polymer#0.5.2",
+        "core-scaffold": "Polymer/core-scaffold#0.5.2",
+        "paper-input": "Polymer/paper-input#0.5.2",
+        "paper-fab": "Polymer/paper-fab#0.5.2",
+        "core-item": "Polymer/core-item#0.5.2",
+        "pubnub-element": "3.6.7"
+    }
+}
+

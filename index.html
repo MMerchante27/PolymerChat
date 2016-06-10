@@ -5,15 +5,12 @@
     <meta charset="UTF-8">
     <title>Polymer Chat</title>
     <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
-  
-	<link rel="import" href="bower_components/pubnub-polymer/pubnub-element.html">
-	<link rel="import" href="bower_components/core-scaffold/core-scaffold.html">
-	<link rel="import" href="bower_components/core-item/core-item.html">
-	<link rel="import" href="bower_components/paper-input/paper-input.html">
-	<link rel="import" href="bower_components/paper-fab/paper-fab.html">
-	<link rel="import" href="elements/elements.html">
-	
-
+    <link rel="import" href="bower_components/core-scaffold/core-scaffold.html">
+    <link rel="import" href="bower_components/core-item/core-item.html">
+    <link rel="import" href="bower_components/paper-input/paper-input.html">
+    <link rel="import" href="bower_components/paper-fab/paper-fab.html">
+    <link rel="import" href="bower_components/pubnub-element/pubnub-element.html">
+    <link rel="import" href="elements/elements.html">
 </head>
 
 <body fullbleed unresolved>
@@ -123,8 +120,7 @@
                 uuid: uuid,
                 avatar: avatar,
                 color: color,
-                text: template.input,
-                timestamp: new Date().toISOString()
+                text: template.input
             };
             template.$.pub.publish();
             template.input = '';
