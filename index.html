@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Polymer Chat</title>
+    <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+    <link rel="import" href="bower_components/core-scaffold/core-scaffold.html">
+    <link rel="import" href="bower_components/core-item/core-item.html">
+    <link rel="import" href="bower_components/paper-input/paper-input.html">
+    <link rel="import" href="bower_components/paper-fab/paper-fab.html">
+</head>
+
+<body fullbleed unresolved>
+    <template is="auto-binding">
+        <core-scaffold>
+            <!-- Drawer panel -->
+            <core-header-panel navigation flex>
+                <core-toolbar class="tall">
+                    <!-- an avatar and username will be here -->
+                </core-toolbar>
+            </core-header-panel>
+           
+            <!-- App Title -->
+            <div tool layout horizontal flex>
+                <span flex>Polymer Chat</span>
+                <core-icon icon="account-circle"></core-icon>
+                <span><!-- number of people online --></span>
+            </div>
+            <!-- Main content -->
+            <div class="send-message" layout horizontal>
+                <paper-input flex label="Type message..." id="input" value="{{input}}"></paper-input>
+                <paper-fab icon="send" id="sendButton" on-tap="{{sendMyMessage}}"></paper-fab>
+            </div>
+
+             <section layout vertical id="onlineList">
+                <core-item label="Build with:"></core-item>
+                <template repeat="{{item in items}}">
+                    <core-item icon="{{item.icon}}" label="{{item.title}}"></core-item>
+                </template>
+            </section>
+        </core-scaffold>
+    </template>
+    <script>
+    var template = document.querySelector('template[is=auto-binding]');
+
+    template.items = [{
+        title: 'PubNub',
+        icon: 'cloud'
+    }, {
+        title: 'Polymer',
+        icon: 'polymer'
+    }, {
+        title: 'Love',
+        icon: 'favorite'
+    }];
+
+    </script>
+</body>
+
+</html>
+
