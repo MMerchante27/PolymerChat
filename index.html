@@ -5,55 +5,136 @@
     <meta charset="UTF-8">
     <title>Polymer Chat</title>
     <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
-    <link rel="import" href="bower_components/core-scaffold/core-scaffold.html">
-    <link rel="import" href="bower_components/core-item/core-item.html">
-    <link rel="import" href="bower_components/paper-input/paper-input.html">
-    <link rel="import" href="bower_components/paper-fab/paper-fab.html">
+  
+	<link rel="import" href="bower_components/pubnub-polymer/pubnub-element.html">
+	<link rel="import" href="bower_components/core-scaffold/core-scaffold.html">
+	<link rel="import" href="bower_components/core-item/core-item.html">
+	<link rel="import" href="bower_components/paper-input/paper-input.html">
+	<link rel="import" href="bower_components/paper-fab/paper-fab.html">
+	<link rel="import" href="elements/elements.html">
+	
+
 </head>
 
 <body fullbleed unresolved>
     <template is="auto-binding">
+        <core-pubnub publish_key="pub-c-eee249f6-dbf7-47db-9302-be78b56e4d2a" subscribe_key="sub-c-eca26e82-2ee1-11e6-b700-0619f8945a4f" uuid="{{uuid}}">
+            <core-pubnub-subscribe channel="polymer-chat" id="sub" messages="{{messages}}" on-callback="{{subscribeCallback}}">
+                <core-pubnub-publish channel="polymer-chat" id="pub" message=""></core-pubnub-publish>
+            </core-pubnub-subscribe>
+        </core-pubnub>
         <core-scaffold>
             <!-- Drawer panel -->
             <core-header-panel navigation flex>
-                <core-toolbar class="tall">
-                    <!-- an avatar and username will be here -->
+                <core-toolbar id="navheader" class="tall">
+                    <div class="middle avatar {{color}}" style="background-image: url({{avatar}})"></div>
+                    <div class="bottom uuid">{{uuid}}</div>
                 </core-toolbar>
+                <section layout vertical id="onlineList">
+                    <core-item label="Build with:"></core-item>
+                    <template repeat="{{item in items}}">
+                        <core-item icon="{{item.icon}}" label="{{item.title}}"></core-item>
+                    </template>
+                </section>
             </core-header-panel>
-           
-            <!-- App Title -->
             <div tool layout horizontal flex>
                 <span flex>Polymer Chat</span>
                 <core-icon icon="account-circle"></core-icon>
-                <span><!-- number of people online --></span>
+                <span>{{occupancy}}</span>
             </div>
             <!-- Main content -->
-            <div class="send-message" layout horizontal>
-                <paper-input flex label="Type message..." id="input" value="{{input}}"></paper-input>
-                <paper-fab icon="send" id="sendButton" on-tap="{{sendMyMessage}}"></paper-fab>
-            </div>
-
-             <section layout vertical id="onlineList">
-                <core-item label="Build with:"></core-item>
-                <template repeat="{{item in items}}">
-                    <core-item icon="{{item.icon}}" label="{{item.title}}"></core-item>
-                </template>
+            <section layout vertical fit id="chat">
+                <div flex class="chat-list">
+                    <template repeat="{{message in messages}}">
+                        <x-chat-list color="{{message.color}}" avatar="{{message.avatar}}" username="{{message.uuid}}" text="{{message.text}}" status="{{message.status}}" timestamp="{{message.timestamp}}"></x-chat-list>
+                    </template>
+                </div>
+                <div class="shim"></div>
+                <div class="send-message" layout horizontal>
+                    <paper-input flex label="Type message..." id="input" value="{{input}}" on-keyup="{{checkKey}}"></paper-input>
+                    <paper-fab icon="send" id="sendButton" on-tap="{{sendMyMessage}}"></paper-fab>
+                </div>
             </section>
-        </core-scaffold>
     </template>
     <script>
-    var template = document.querySelector('template[is=auto-binding]');
+    (function() {
+        'use strict';
 
-    template.items = [{
-        title: 'PubNub',
-        icon: 'cloud'
-    }, {
-        title: 'Polymer',
-        icon: 'polymer'
-    }, {
-        title: 'Love',
-        icon: 'favorite'
-    }];
+        var uuid, avatar, color, cat;
+
+        // Assign a uuid made of a random cat and a random color
+        var randomColor = function() {
+            var colors = ['navy', 'slate', 'olive', 'moss', 'chocolate', 'buttercup', 'maroon', 'cerise', 'plum', 'orchid'];
+            return colors[(Math.random() * colors.length) >>> 0];
+        };
+
+        var randomCat = function() {
+            var cats = ['tabby', 'bengal', 'persian', 'mainecoon', 'ragdoll', 'sphynx', 'siamese', 'korat', 'japanesebobtail', 'abyssinian', 'scottishfold'];
+            return cats[(Math.random() * cats.length) >>> 0];
+        };
+
+        color = randomColor();
+        cat = randomCat();
+        uuid = color + '-' + cat;
+        avatar = 'images/' + cat + '.jpg';
+
+        function showNewest() {
+            var chatDiv = document.querySelector('.chat-list');
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+        }
+
+        /* Polymer UI and UX */
+
+        var template = document.querySelector('template[is=auto-binding]');
+
+        template.channel = 'polymer-chat';
+        template.uuid = uuid;
+        template.avatar = avatar;
+        template.color = color;
+
+        template.items = [{
+            title: 'PubNub',
+            icon: 'cloud'
+        }, {
+            title: 'Polymer',
+            icon: 'polymer'
+        }, {
+            title: 'Love',
+            icon: 'favorite'
+        }];
+
+        template.checkKey = function(e) {
+            if (e.keyCode === 13 || e.charCode === 13) {
+                template.publish();
+            }
+        };
+
+        template.sendMyMessage = function(e) {
+            template.publish();
+        };
+
+
+        /* PubNub Realtime Chat */
+
+        template.publish = function() {
+            if (!template.input) return;
+
+            template.$.pub.message = {
+                uuid: uuid,
+                avatar: avatar,
+                color: color,
+                text: template.input,
+                timestamp: new Date().toISOString()
+            };
+            template.$.pub.publish();
+            template.input = '';
+        };
+
+        template.subscribeCallback = function(e) {
+            template.async(showNewest);
+        };
+
+    })();
 
     </script>
 </body>
